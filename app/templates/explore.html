@@ -229,7 +229,7 @@
     \lvert C(B) \rvert$. (2) If $A \mathcal{R} B$, then $\lvert R(A) \rvert = \lvert R(B) \rvert$. (3) If $A
     \mathcal{D} B$, then $\lvert R(A) \rvert = \lvert R(B) \rvert = \lvert C(B) \rvert = \lvert C(B) \rvert = \lvert
     C(A) \rvert$.</p>
-    <p><b>Proof.</b> Ovious from THeorem 2.3 and Lemma 3.1 &#9647;</p>
+    <p><b>Proof.</b> Ovious from Theorem 2.3 and Lemma 3.1 &#9647;</p>
     <p><b>Devinition 3.5.</b> A family $\underline{m}$ of subsets of $\underline{n}$ is an <i>additive
     space</i> if $\emptyset \in \underline{m}$ and $\underline{s} \cup \underline{t} \in \underline{m}$ where
     $\underline{s}, \underline{t} \in \underline{m}$. Two such families are isomorphic if and only if they are
@@ -267,6 +267,67 @@
     $\theta$ denotes the identity element of $G$. Thus $\lvert S \rvert - a < k + t$. Yest $\vert S \rvert \ge k + 2t$.
     Thus $$\lvert S \rvert - a < k + {\lvert S \rvert - k \over 2}$$ which yields the desired inequality on $k$.
     &#9647;</p>
+    <p>From this lemma we derive an asymptotic bound on the number of $\mathcal{D}$-classes. Namely for two matrices
+    of row rank $n$, if they are $\mathcal{L}$-equivalent they have the same row basis, but the row basis consists of
+    all rows. Thus the rows of one matix are a permutation of the other matrix. Thus $A \mathcal{L} B$ if and only if
+    $A=PB$ for a permutation matrix $B$. Likewise $A \mathcal{R} B$ if and only if $A=BQ$. It follows that $A
+    \mathcal{D} B$ if and only if $A=PBQ$. Thus these $\mathcal{D}$-classes have at most $n!m!$ members. Thus the
+    number of $\mathcal{D}$-classes of these row and column rank $n$ element is at least $${2^{nm}-o(2^{nm}) \over
+    n!m!} = {2^{nm} \over n!m! } (1-O(1))$$ This gives the lower bound. To prove the upper bound, we will prove that
+    the number of $D$-classes containing a matrix $X$ such that $PXQ=X$ for nonidentity permutation matrices $P, Q$
+    is $$o({2^{nm} \over n!m!})$$ This means most $D$-classes have at least $n!m!$ members. Thus the number of
+    $\mathcal{D}$-classes cannot exceed $${2^{nm} \over n!m!}(1-o(1))$$</p>
+    <p><b>Theorem 1.4.6.</b> Let $n$, $m$ tend to infinity in such a way that $n/m$ tends to a nonzero constant. Then
+    the number of $\mathcal{D}$-classes of $m \times n$ Boolean matrices is asymptotically equal to $${2^{nm} \over
+    n!m!}$$</p>
+    <p><b>Proof.</b> By Lemma 1.3.12 and the consideration after its proof we need only prove this formula gives an
+    asymptotic upper bound.</p>
+    <p>Let $k=\sup\{\lim n/m, \lim m/n\}$. Case 1. $\mathcal{D}$-classes containing some $X$ such that $PXQ=X$ for some
+    $P$, $Q$ such that $P$ has no more than $m-(4k+1)\log m$ cycles. (All logarithms are base 2). For fixed $P$, $Q$
+    with $P$ satisfying the hypothesis of this case, there are at most $$2^{(m-(4k+1)\log m)n}$$ matrices $X$ such that
+    $PXQ=X$, by Lemma 1.3.13. The number of possibilities for $P$, $Q$ cannot exceed $n!m!$. Thus the number of
+    possibilities for $X$ in the present case is at most $$2^{(m-(4k+1)\log m)n}n!m!$$ Thus also the number of
+    $\mathcal{D}$-classes containing at least one such $X$ is at most $$2^{(m-(4k+1)\log m)n}n!m!$$ The ratio of this
+    number to $${2^{nm} \over n!m!}$$ will approach zero.</p>
+    <p>Case 2. $\mathcal{D}$-classes containing some matrix $X$ such that $PXQ=X$ for some $P$, $Q$ such that $Q$ has
+    no more than $n-(4k+1)\log n$ cycles. This case is treated like Case 1.</p>
+    <p>Case 3. $\mathcal{D}$-classes containing a matrix $X$ such that $PXQ=X$ for some $P$, $Q$ not both identity but
+    such that $PXQ=X$ does not hold for any $P$, $Q$ with $P$ having no more that $m-(4k+1)\log m$ cycles or $Q$
+    having no more than $n-(4k+1)\log n$ cycles. FOr such an $X$, choose a pair $P$, $Q$ satisfying $PXQ=X$ such that
+    $\sup \{m-$number of cycles in $P, n-$number of cycles in $Q\}$ is a maximum. Let $s$ denote this maximum. We have
+    $0 < s < (4k+1)(\sup\{\log m, \log n\})$. For a given $X$ the set $\{P: PXQ=X $for some $Q\}$ forms a group. Each
+    elemnt of this group will fix at least $m-2s$ letters by Lemma 1.3.14. Thus by Lemma 1.3.12 the whole group will
+    fix at least $m-4s$ letters. There is a similar group of $Q$'s which fixes at least $n-4s$ letters.</p>
+    <p>FIx $s$. We first choose a set of $4s$ letters which is to contain the set of all non-fixed letter under $\{P:
+    PXQ=X$ for some $Q\}$. There are $\begin{pmatrix}m \\ 4s \end{pmatrix}$ such choices. There is $\begin{pmatrix}n \\
+    4s\end{pmatrix}$ choices for a similar set for $\{Q: PXQ=X$ for some $P\}$. Given that these sets are chosen, we
+    can choose $P$ in $(4s)!$ ways to act on its set and $Q$ in $(4s)!$ ways to act on its set. Once $P$, $Q$ are
+    chosen we can choose $X$ in at most $$2^{nm-s(\min\{n,m\})}$$ ways by Lemma 1.3.13. Thus for given $s$, there are at
+    most $$\begin{pmatrix}m \\ 4s\end{pmatrix} \begin{pmatrix}m \\ 4s\end{pmatrix} (4s)! (4s)! 2^{nm - s (\min\{n,
+    m\})}$$ choices of $X$ having the required value of $s$. However these $X$'s do not all lie in different
+    $\mathcal{D}$-classes. For any permutation matrices $E$, $F$; $EXF$ lie in the $\mathcal{D}$-class and have the
+    same value of $s$.</p>
+    <p>How many different matrixes $EXF$ are there for a given $X$? We have a group action of the product of two
+    symmetric groups on such matrices, sending $Y$ to $EYF^{-1}$. Here $F^{-1}$ denotes the inverse of $F$. The
+    isotropy group of $X$ has order at most $(4s)!(4s)!$ by the remarks above about choosing $P$, $Q$ such that $PXQ =
+    X$. Thus $\mathcal{D}$-class containing one $X$ also contains at least $${n!m! \over (4s)! (4s)!}$$ other matrices
+    with the same $s$. Thus the number of $D$-classes containing matrices of this type for given $s$ is at most
+    $${m^{4s} n^{4s} 2^{nm - s (min\{n, m\})} (4s)! (4s)! \over n!m!}$$ Allowing any value of $s$ we have at most
+    $$1 \le s \le (4k+1) n_1^{m^{4s} n^{4s} 2^{nm-sn} 2 ((4s)!(4s)!)(4k+1)\log n_1 \over n!m!}$$ where $n_1 = \max \{n,
+    m\}$ and $n_2 = \min \{n, m \}$. The ratio of this quantity to $${2^{nm} \over n!m!}$$ tends to zero.</p>
+    <p>Case 4. All $PXQ$ are distinct so the $\mathcal{D}$-classes have at least $n!m!$ elements. There are at most
+    $${2^{nm} \over n!m!}$$ $\mathcal{D}$-classes of this type. This proves the theorem. &#9647;</p>
+    <p><b>Corollary 1.3.17.</b> Let $k$ be the number of matrices $X$ such that $PXQ=X$ for some $P$, $Q$ not both the
+    identity. Then if $n, m \rightarrow \infty$ in such a way that $n \over m$ approaches a nonzero constant, $${k
+    \over 2^{nm}}$$ approaches $0$.</p>
+    <p><b>Theorem 1.3.18.</b> Under the hypotheses of Lemma 1.3.12, then the numbers of $\mathcal{D}$-classes of
+    $\mathcal{D}$-classes of $B_{mn}$ are asymptotically equal to $${2^{nm} \over n!}, {2^{nm} \over m!}$$ respectively.
+    The number of $\mathcal{H}$-classes is asymptotically equal to $2^{nm}$.</p>
+    <p><b>Proof.</b> FOr an upper bound, for instance for $\mathcal{R}$-classes we have $$\begin{pmatrix}2^m \\
+    n\end{pmatrix} + \begin{pmatrix}2^m \\ n-1\end{pmatrix} + ... + \begin{pmatrix}2^m \\ 1\end{pmatrix}$$ for column
+    rank $k$, by choosing a set of $k$ column vectors to be a column basis. This is less than or equal to
+    $$\begin{pmatrix}2^m \\ n\end{pmatrix} \sum_{i=1}^\infty ({n \over 2^m -1})^i$$ which gives the theorem. Similar
+    methods apply in the other cases. This proves the theorem. &#9647;</p>
 {% endblock %}
 
 {% block scripts %}
