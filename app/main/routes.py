@@ -1,11 +1,11 @@
-from app import app
+from app.main import bp
 from flask import render_template
 
 
-@app.route('/')
+@bp.route('/')
 def index():
     return render_template('index.html', title='Home')
 
-@app.route('/explore')
+@bp.route('/explore')
 def explore():
     return render_template('explore.html', title='Theory')
