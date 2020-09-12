@@ -239,7 +239,7 @@
     most $m$ generators toher than $0$ under union and the lattice has $n$ generatiors other then the highest element
     under intersection).</p>
     <p><b>Lemma 3.12.</b> Let $n$, $m$ tend to infinity in such a way that $${\log n \over m}
-    \rightarrow 0, {\log m \over n} \rightarrow 0$$ Then the proportion of $m \times n$ matrices which have both row 
+    \rightarrow 0, {\log m \over n} \rightarrow 0$$ Then the proportion of $m \times n$ matrices which have both row
     rank $m$ and column rank $n$ tends to $1$.</p>
     <p><b>Proof.</b> Let $r(i, j)$ denote the number of matrices with $A_{i*} \ge A_{j*}$ and $c(i, j)$ the number with
     $A_{*i} \ge A_{*j}$. Then for fixed $i \ne j$ we have $${r(i,j) \over k}=({3 \over 4})^m, {c(i, j) \over k} = ({3
@@ -328,17 +328,4 @@
     rank $k$, by choosing a set of $k$ column vectors to be a column basis. This is less than or equal to
     $$\begin{pmatrix}2^m \\ n\end{pmatrix} \sum_{i=1}^\infty ({n \over 2^m -1})^i$$ which gives the theorem. Similar
     methods apply in the other cases. This proves the theorem. &#9647;</p>
-{% endblock %}
-
-{% block scripts %}
-    <script type="text/javascript" id="MathJax-script" async
-            src="http://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
-    </script>
-    <script>
-        MathJax = {
-          tex: {
-            inlineMath: [['$', '$']]
-          }
-        };
-    </script>
 {% endblock %}

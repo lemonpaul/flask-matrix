@@ -25,6 +25,7 @@
                 <ul class="nav navbar-nav">
                     <li><a href="{{ url_for('main.index') }}">Home</a></li>
                     <li><a href="{{ url_for('main.explore') }}">Theory</a></li>
+                    <li><a href="{{ url_for('main.matrices') }}">Matrices</a></li>
                 </ul>
             </div>
         </div>
@@ -37,4 +38,15 @@
     </div>
 {% endblock %}
 
-{% block scripts %}{% endblock %}
+{% block scripts %}
+    <script type="text/javascript" id="MathJax-script" async
+            src="http://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+    <script>
+        MathJax = {
+          tex: {
+            inlineMath: [['$', '$']]
+          }
+        };
+    </script>
+{% endblock %}

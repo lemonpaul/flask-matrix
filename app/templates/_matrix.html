@@ -1,0 +1,11 @@
+    {% set array = matrix.to_array() %}
+    $$\begin{Vmatrix}{% for column in range(matrix.height - 1) %}
+                         {% for row in range(matrix.width - 1) %}
+                             {{ array[column][row] }}&
+                         {% endfor %}
+                         {{ array[column][matrix.width - 1] }}\\
+                     {% endfor %}
+                     {% for row in range(matrix.width - 1) %}
+                         {{ array[matrix.height - 1][row] }}&
+                     {% endfor %}
+                     {{ array[matrix.height - 1][matrix.width - 1] }}\end{Vmatrix}$$
