@@ -1,5 +1,5 @@
 from app.main import bp
-from app.models import Matrix
+from app.models import Matrix, H_class, L_class, R_class
 from flask import render_template, request, url_for, current_app
 
 
@@ -7,9 +7,11 @@ from flask import render_template, request, url_for, current_app
 def index():
     return render_template('index.html', title='Home')
 
+
 @bp.route('/explore')
 def explore():
     return render_template('explore.html', title='Theory')
+
 
 @bp.route('/matrices')
 def matrices():
@@ -24,8 +26,37 @@ def matrices():
     return render_template('matrices.html', title='Matrices', matrices=matrices.items,
                            next_url=next_url, prev_url=prev_url)
 
-@bp.route('/classes')
-def classes():
-    matrices = Matrix.query.all()[-136:-120]
-    return render_template('classes.html', title='Classes', matrices=matrices)
 
+@bp.route('/h_classes')
+def h_classes():
+    h_classes = H_class.query.all()
+    return render_template('h_classes.html', title='H classes', h_classes=h_classes)
+
+
+@bp.route('/h_class/<int:h_class_id>')
+def h_class(h_class_id):
+    h_class = H_class.query.get(h_class_id)
+    return render_template('h_class.html', title='H Class', h_class=h_class)
+
+@bp.route('/l_classes')
+def l_classes():
+    l_classes = L_class.query.all()
+    return render_template('l_classes.html', title='L classes', l_classes=l_classes)
+
+
+@bp.route('/l_class/<int:l_class_id>')
+def l_class(l_class_id):
+    l_class = L_class.query.get(l_class_id)
+    return render_template('l_class.html', title='L Class', l_class=l_class)
+
+
+@bp.route('/r_classes')
+def r_classes():
+    r_classes = R_class.query.all()
+    return render_template('r_classes.html', title='R classes', r_classes=r_classes)
+
+
+@bp.route('/r_class/<int:r_class_id>')
+def r_class(r_class_id):
+    r_class = R_class.query.get(r_class_id)
+    return render_template('r_class.html', title='R Class', r_class=r_class)
