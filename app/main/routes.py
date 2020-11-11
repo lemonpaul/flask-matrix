@@ -1,5 +1,5 @@
 from app.main import bp
-from app.models import Matrix, H_class, L_class, R_class
+from app.models import Matrix, H_class, L_class, R_class, D_class
 from flask import render_template, request, url_for, current_app
 
 
@@ -60,3 +60,15 @@ def r_classes():
 def r_class(r_class_id):
     r_class = R_class.query.get(r_class_id)
     return render_template('r_class.html', title='R Class', r_class=r_class)
+
+
+@bp.route('/d_class/<int:d_class_id>')
+def d_class(d_class_id):
+    d_class = D_class.query.get(d_class_id)
+    return render_template('d_class.html', title='D Class', d_class=d_class)
+
+
+@bp.route('/d_classes')
+def d_classes():
+    d_classes = D_class.query.all()
+    return render_template('d_classes.html', title='D classes', d_classes=d_classes)

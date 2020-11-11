@@ -1,9 +1,13 @@
 {% extends "base.html" %}
 
 {% block app_content %}
-    <h1>Classes</h1>
-    {% for matrix in matrices %}
-        {% include '_class.html' %}
+    <h1>L classes</h1>
+    {% for l_class in d_class.l_classes %}
+        {% include '_l_class.html' %}
+    {% endfor %}
+    <h1>R classes</h1>
+    {% for r_class in d_class.r_classes %}
+        {% include '_r_class.html' %}
     {% endfor %}
     <nav aria-label="...">
         <ul class="pager">

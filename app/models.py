@@ -11,8 +11,6 @@ class Matrix(db.Model):
     body = db.Column(db.Integer)
     h_class_id = db.Column(db.Integer, db.ForeignKey('h_class.id'))
     h_class = relationship('H_class', back_populates='matrices')
-    d_class_id = db.Column(db.Integer, db.ForeignKey('d_class.id'))
-    d_class = relationship('D_class', back_populates='matrices')
 
     def to_array(self):
         data = [[]] * self.height
@@ -51,16 +49,20 @@ class L_class(db.Model):
     __tablename__ = 'l_class'
     id = db.Column(db.Integer, primary_key=True)
     h_classes = relationship('H_class', back_populates='l_class')
+    d_class_Id = db.Column(db.Integer, db.ForeignKey('d_class.id'))
+    d_class = relationship('D_class', back_populates='l_classes')
 
 
 class R_class(db.Model):
     __tablename__ = 'r_class'
     id = db.Column(db.Integer, primary_key=True)
     h_classes = relationship('H_class', back_populates='r_class')
+    d_class_Id = db.Column(db.Integer, db.ForeignKey('d_class.id'))
+    d_class = relationship('D_class', back_populates='r_classes')
 
 
 class D_class(db.Model):
     __tablename__ = 'd_class'
     id = db.Column(db.Integer, primary_key=True)
-    matrices = relationship('Matrix', back_populates='d_class')
-
+    l_classes = relationship('L_class', back_populates='d_class')
+    r_classes = relationship('R_class', back_populates='d_class')
