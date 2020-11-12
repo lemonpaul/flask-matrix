@@ -2,16 +2,29 @@
 
 {% block app_content %}
     <h1>Matrices</h1>
-    {% for matrix in matrices %}
-        {% set array = matrix.to_array() %}
-        {% include '_matrix.html' %}
+    <table style="width: 100%;">
+        {% for i in range(4) %}
+        <tr>
+        {% for j in range(5) %}
+            <td>
+                {% if (page - 1) * per_page + 5 * i + j < total %}
+                    {% set array = matrices[5*i+j].to_array() %}
+                    {% include '_matrix.html' %}
+                {% endif %}
+            </td>
+        {% endfor %}
+        </tr>
     {% endfor %}
+    </table>
     <nav aria-label="...">
         <ul class="pager">
             <li class="previous{% if not prev_url %} disabled{% endif %}">
                 <a href="{{ prev_url or '#' }}">
                     <span aria-hidden="true">&larr;</span> Previous
                 </a>
+            </li>
+            <li>
+                {{ page }}/{{ pages }}
             </li>
             <li class="next{% if not next_url %} disabled{% endif %}">
                 <a href="{{ next_url or '#' }}">

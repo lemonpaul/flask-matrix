@@ -19,11 +19,14 @@ def matrices():
     matrices = Matrix.query.paginate(
         page, current_app.config['MATRICES_PER_PAGE'], False
     )
+    first_url = url_for('main.matrices', page=1)
+    last_url = url_for('main.matrices', page=matrices.pages)
     next_url = url_for('main.matrices', page=matrices.next_num) \
         if matrices.has_next else None
     prev_url = url_for('main.matrices', page=matrices.prev_num) \
         if matrices.has_prev else None
     return render_template('matrices.html', title='Matrices', matrices=matrices.items,
+                           page=matrices.page, pages=matrices.pages, per_page=matrices.per_page, total=matrices.total,
                            next_url=next_url, prev_url=prev_url)
 
 
