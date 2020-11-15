@@ -18,6 +18,10 @@ class Matrix(db.Model):
     d_class_id = db.Column(db.Integer, db.ForeignKey('d_class.id'))
     d_class = relationship('D_class', back_populates='matrices')
 
+    __mapper_args__ = {
+        "order_by": id
+    }
+
     def to_array(self):
         data = [[]] * self.height
         for k in range(self.height):
@@ -46,6 +50,10 @@ class H_class(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     matrices = relationship('Matrix', back_populates='h_class')
 
+    __mapper_args__ = {
+        "order_by": id
+    }
+
 
 class L_class(db.Model):
     __tablename__ = 'l_class'
@@ -58,8 +66,16 @@ class R_class(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     matrices = relationship('Matrix', back_populates='r_class')
 
+    __mapper_args__ = {
+        "order_by": id
+    }
+
 
 class D_class(db.Model):
     __tablename__ = 'd_class'
     id = db.Column(db.Integer, primary_key=True)
     matrices = relationship('Matrix', back_populates='d_class')
+
+    __mapper_args__ = {
+        "order_by": id
+    }
