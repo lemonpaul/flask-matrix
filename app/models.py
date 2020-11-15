@@ -3,6 +3,11 @@ from app.utils import transpose, space
 from sqlalchemy.orm import relationship
 
 
+def intersection(r_class, l_class):
+    join = set(r_class.h_classes()) & set(l_class.h_classes())
+    return list(join)[0]
+
+
 class Matrix(db.Model):
     __tablename__ = 'matrix'
     id = db.Column(db.Integer, primary_key=True)
@@ -60,6 +65,13 @@ class L_class(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     matrices = relationship('Matrix', back_populates='l_class')
 
+    __mapper_args__ = {
+        "order_by": id
+    }
+
+    def h_classes(self):
+        return H_class.query.join(Matrix).join(L_class).filter_by(id=self.id).all()
+
 
 class R_class(db.Model):
     __tablename__ = 'r_class'
@@ -70,6 +82,9 @@ class R_class(db.Model):
         "order_by": id
     }
 
+    def h_classes(self):
+        return H_class.query.join(Matrix).join(R_class).filter_by(id=self.id).all()
+
 
 class D_class(db.Model):
     __tablename__ = 'd_class'
@@ -79,3 +94,12 @@ class D_class(db.Model):
     __mapper_args__ = {
         "order_by": id
     }
+
+    def h_classes(self):
+        return H_class.query.join(Matrix).join(D_class).filter_by(id=self.id).all()
+
+    def l_classes(self):
+        return L_class.query.join(Matrix).join(D_class).filter_by(id=self.id).all()
+
+    def r_classes(self):
+        return R_class.query.join(Matrix).join(D_class).filter_by(id=self.id).all()

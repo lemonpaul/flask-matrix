@@ -1,6 +1,6 @@
 from app import db
 from app.main import bp
-from app.models import Matrix
+from app.models import Matrix, intersection
 from flask import render_template, request, url_for, current_app
 from importlib import import_module
 from app.tasks import app
@@ -15,7 +15,15 @@ def index():
 
 @bp.route('/explore')
 def explore():
-    return render_template('explore.html', title='Theory')
+    from app.models import D_class, L_class
+    d_classes = D_class.query.all()
+    total = L_class.query.count()
+    return render_template('explore.html', title='Structure', d_classes=d_classes, intersection=intersection, total=total)
+
+
+@bp.route('/theory')
+def theory():
+    return render_template('theory.html', title='Theory')
 
 
 @bp.route('/matrix')

@@ -24,12 +24,13 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     <li><a href="{{ url_for('main.index') }}">Home</a></li>
-                    <li><a href="{{ url_for('main.explore') }}">Theory</a></li>
+                    <li><a href="{{ url_for('main.theory') }}">Theory</a></li>
+                    <li><a href="{{ url_for('main.explore') }}">Structure</a></li>
                     <li><a href="{{ url_for('main.matrix_index') }}">Matrices</a></li>
-                    <li><a href="{{ url_for('main.class_index', class_name='H') }}">H classes</a></li>
-                    <li><a href="{{ url_for('main.class_index', class_name='L') }}">L classes</a></li>
-                    <li><a href="{{ url_for('main.class_index', class_name='R') }}">R classes</a></li>
-                    <li><a href="{{ url_for('main.class_index', class_name='D') }}">D classes</a></li>
+                    <li><a href="{{ url_for('main.class_index', class_name='H') }}">H-classes</a></li>
+                    <li><a href="{{ url_for('main.class_index', class_name='L') }}">L-classes</a></li>
+                    <li><a href="{{ url_for('main.class_index', class_name='R') }}">R-classes</a></li>
+                    <li><a href="{{ url_for('main.class_index', class_name='D') }}">D-classes</a></li>
                 </ul>
             </div>
         </div>
