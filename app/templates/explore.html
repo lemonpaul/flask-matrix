@@ -14,7 +14,7 @@
                 {% for column in class.l_classes() %}
                     {% set h_class = intersection(row, column) %}
                     <td style="border: 1px solid;">
-                        <a href="{{ url_for('main.class_index', class_name='H', class_id=h_class.id) }}">
+                        <a href="{{ url_for('main.class_show', class_name='H', class_id=h_class.id) }}">
                             {{ h_class.matrices|length }}
                         </a>
                     </td>
