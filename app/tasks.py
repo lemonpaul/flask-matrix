@@ -30,29 +30,29 @@ def init_h_classes():
 
 
 def init_l_classes():
-    for h_class in H_class.query.all():
+    for matrix in Matrix.query.all():
         for l_class in L_class.query.all():
-            l_h_class = l_class.h_classes[0]
-            if h_class.matrices[0].row_space() == l_h_class.matrices[0].row_space():
-                l_class.h_classes.append(h_class)
+            class_matrix = l_class.matrices[0]
+            if matrix.row_space() == class_matrix.row_space():
+                l_class.matrices.append(matrix)
                 break
         else:
             l_class = L_class()
-            l_class.h_classes.append(h_class)
+            l_class.matrices.append(matrix)
             db.session.add(l_class)
     db.session.commit()
 
 
 def init_r_classes():
-    for h_class in H_class.query.all():
+    for matrix in Matrix.query.all():
         for r_class in R_class.query.all():
-            r_h_class = r_class.h_classes[0]
-            if h_class.matrices[0].column_space() == r_h_class.matrices[0].column_space():
-                r_class.h_classes.append(h_class)
+            class_matrix = r_class.matrices[0]
+            if matrix.column_space() == class_matrix.column_space():
+                r_class.matrices.append(matrix)
                 break
         else:
             r_class = R_class()
-            r_class.h_classes.append(h_class)
+            r_class.matrices.append(matrix)
             db.session.add(r_class)
     db.session.commit()
 
@@ -60,29 +60,24 @@ def init_r_classes():
 def init_d_classes():
     for matrix in Matrix.query.all():
         for d_class in D_class.query.all():
-            class_matrix = d_class.l_classes[0].h_classes[0].matrices[0]
-            if len(matrix.row_space()) == len(class_matrix.row_space()):
-                d_class.l_classes.append(matrix.h_class.l_class)
-                d_class.r_classes.append(matrix.h_class.r_class)
+            class_matrix = d_class.matrices[0]
+            if matrix.column_space() == class_matrix.column_space() or matrix.row_space() == class_matrix.row_space():
+                d_class.matrices.append(matrix)
                 break
         else:
             d_class = D_class()
-            d_class.l_classes.append(matrix.h_class.l_class)
-            d_class.r_classes.append(matrix.h_class.r_class)
+            d_class.matrices.append(matrix)
             db.session.add(d_class)
     db.session.commit()
 
 
-def clear():
+def init():
     Matrix.query.delete()
     H_class.query.delete()
     L_class.query.delete()
     R_class.query.delete()
     D_class.query.delete()
     db.session.commit()
-
-
-def init():
     init_matrices()
     init_h_classes()
     init_l_classes()

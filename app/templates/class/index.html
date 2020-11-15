@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 
 {% block app_content %}
-    <h1>R classes</h1>
-    {% for r_class in r_classes %}
-        {% include '_r_class.html' %}
+    <h1>{{ class_name }} classes</h1>
+    {% for class in classes %}
+        <a href={{ url_for('main.class_show', class_name=class_name,
+            class_id=class.id) }}>{{class.matrices|length}}</a>
     {% endfor %}
     <nav aria-label="...">
         <ul class="pager">
