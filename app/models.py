@@ -30,11 +30,11 @@ class Matrix(db.Model):
         return data
 
     def column_space(self):
-        matrix = self.to_array()
+        matrix = transpose(self.to_array())
         return space(matrix)
 
     def row_space(self):
-        matrix = transpose(self.to_array())
+        matrix = self.to_array()
         return space(matrix)
 
     def __repr__(self):

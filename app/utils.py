@@ -22,5 +22,8 @@ def transpose(matrix):
 
 def space(matrix):
     vectors = list(matrix)
+    null_vector = [0] * len(vectors[0])
+    if null_vector not in vectors:
+        vectors.append(null_vector)
 
     return set(tuple(vector) for vector in vectors)
