@@ -1,0 +1,19 @@
+<table>
+    <tr>
+    {% for matrix in matrices %}
+        <td>
+            {% set array = matrix.to_array() %}
+            $$\begin{Vmatrix}{% for column in range(array|length - 1)        %}
+                             {%     for row in range(array[0]|length - 1)    %}
+                             {{         array[column][row]                  }}&
+                             {%     endfor                                   %}
+                             {{     array[column][array[0]|length - 1]     }}\\
+                             {% endfor                                       %}
+                             {% for row in range(array[0]|length - 1)        %}
+                             {{     array[array|length - 1][row]            }}&
+                             {% endfor                                       %}
+                             {{ array[array|length - 1][array[0]|length - 1] }}\end{Vmatrix}$$
+        </td>
+    {% endfor %}
+    </tr>
+</table>

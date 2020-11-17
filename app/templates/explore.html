@@ -2,6 +2,12 @@
 
 {% block app_content %}
     <h1>Structure of D-classes</h1>
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        {# <div class="modal-content"> #}
+        {# </div> #}
+    </div>
     <table style="width: 100%; text-align: center;">
     {% set offset = namespace(value=0) %}
     {% for class in d_classes %}
@@ -13,8 +19,10 @@
                 {% endfor %}
                 {% for column in class.l_classes() %}
                     {% set h_class = intersection(row, column) %}
-                    <td style="border: 1px solid;">
-                        <a href="{{ url_for('main.class_show', class_name='H', class_id=h_class.id) }}">
+                    <td onmouseenter="h_class_show({{h_class.id}}, {{h_class.matrices|length}}, {{height(h_class)}}, {{width(h_class)}})"
+                        onmouseleave="h_class_hide({{h_class.id}})" style="border: 1px solid;">
+                        <a href="{{ url_for('main.class_show', class_name='H',
+                            class_id=h_class.id) }}">
                             {{ h_class.matrices|length }}
                         </a>
                     </td>

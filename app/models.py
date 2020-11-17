@@ -8,6 +8,14 @@ def intersection(r_class, l_class):
     return list(join)[0]
 
 
+def width(h_class):
+    return h_class.matrices[0].width
+
+
+def height(h_class):
+    return h_class.matrices[0].height
+
+
 class Matrix(db.Model):
     __tablename__ = 'matrix'
     id = db.Column(db.Integer, primary_key=True)
