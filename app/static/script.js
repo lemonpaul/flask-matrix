@@ -1,12 +1,12 @@
 var modal = document.getElementById("myModal");
 
-var h_class_show = function(class_id, length, height, width)
+var class_show = function(class_name, class_id, length)
 {
     xhttp = new XMLHttpRequest();
     left_ = event.pageX + 10;
     top_ = event.pageY + 10;
-    height_ = 26 + 26 * height;
-    width_ = (12 + 24 * width)*length;
+    height_ = 26 + 78;
+    width_ = 84 * length;
     xhttp.onreadystatechange = function() {
         if (this.readyState === XMLHttpRequest.DONE) {
             modal.setAttribute("style", "left: "+left_+"px; top: "+top_+"px; width:"+width_+"px; height: "+height_+"px;");
@@ -15,11 +15,12 @@ var h_class_show = function(class_id, length, height, width)
             MathJax.typeset();
         }
     };
-    xhttp.open("GET", "/class/h_class/"+class_id, true);
+    xhttp.open("GET", "/explore/"+class_name+"/"+class_id, true);
     xhttp.send();
 }
 
-var h_class_hide = function(class_id)
+var class_hide = function()
 {
     modal.style.display = "none";
 }
+

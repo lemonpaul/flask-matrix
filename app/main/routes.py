@@ -13,16 +13,6 @@ def index():
     return render_template('index.html', title='Home')
 
 
-@bp.route('/explore')
-def explore():
-    from app.models import D_class, L_class
-    d_classes = D_class.query.all()
-    total = L_class.query.count()
-    return render_template('explore.html', title='Structure',
-                           d_classes=d_classes, intersection=intersection,
-                           height=height, width=width, total=total)
-
-
 @bp.route('/theory')
 def theory():
     return render_template('theory.html', title='Theory')
@@ -43,12 +33,23 @@ def matrix_index():
                            next_url=next_url, prev_url=prev_url)
 
 
-@bp.route('/class/<string:class_name>')
-def class_index(class_name):
-    model = getattr(import_module('app.models'), class_name+'_class')
-    classes = model.query.all()
+@bp.route('/explore/<string:class_name>')
+def explore_index(class_name):
+    from app.models import D_class
 
-    return render_template('class/index.html', class_name=class_name, classes=classes)
+    d_classes = D_class.query.all()
+    return render_template('explore/index.html', title=class_name+'-classes',
+                           d_classes=d_classes, intersection=intersection, class_name=class_name,
+                           height=height, width=width)
+
+
+@bp.route('/explore/<string:class_name>/<int:class_id>')
+def explore_show(class_name, class_id):
+    model = getattr(import_module('app.models'), class_name+'_class')
+
+    matrices = model.query.get(class_id).matrices
+
+    return render_template('explore/show.html', matrices=matrices)
 
 
 @bp.route('/class/<string:class_name>/<int:class_id>')
@@ -67,12 +68,3 @@ def class_show(class_name, class_id):
     return render_template('class/show.html', class_name=class_name, matrices=matrices.items,
                            page=matrices.page, pages=matrices.pages, per_page=matrices.per_page, total=matrices.total,
                            next_url=next_url, prev_url=prev_url)
-
-
-@bp.route('/class/h_class/<int:class_id>')
-def h_class_show(class_id):
-    from app.models import H_class
-
-    matrices = H_class.query.get(class_id).matrices
-
-    return render_template('class/h_class.html', matrices=matrices)
