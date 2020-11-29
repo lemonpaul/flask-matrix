@@ -45,11 +45,15 @@ def explore_index(class_name):
 
 @bp.route('/explore/<string:class_name>/<int:class_id>')
 def explore_show(class_name, class_id):
+    width = int(request.args.get('width'))
+    height = int(request.args.get('height'))
+    size = int(request.args.get('size'))
+
     model = getattr(import_module('app.models'), class_name+'_class')
 
     matrices = model.query.get(class_id).matrices
 
-    return render_template('explore/show.html', matrices=matrices)
+    return render_template('explore/show.html', matrices=matrices, width=width, height=height, size=size)
 
 
 @bp.route('/class/<string:class_name>/<int:class_id>')

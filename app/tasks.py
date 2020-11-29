@@ -72,7 +72,7 @@ def init_d_classes():
     db.session.commit()
 
 
-def init():
+def init(height=3, width=3):
     Matrix.query.delete()
     H_class.query.delete()
     L_class.query.delete()
@@ -84,7 +84,7 @@ def init():
     db.session.execute("ALTER SEQUENCE r_class_id_seq RESTART WITH 1")
     db.session.execute("ALTER SEQUENCE d_class_id_seq RESTART WITH 1")
     db.session.commit()
-    init_matrices()
+    init_matrices(height, width)
     init_h_classes()
     init_l_classes()
     init_r_classes()

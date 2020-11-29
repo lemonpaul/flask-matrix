@@ -1,3 +1,4 @@
+import click
 from flask import Flask
 from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
@@ -20,10 +21,13 @@ def create_app(config_class=Config):
     from app.main import bp as main_bp
     app.register_blueprint(main_bp)
 
-    @app.cli.command("init")
-    def init():
+    @app.cli.command('init')
+    @click.option('--height', default=3, help='Maximum matix height.')
+    @click.option('--width', default=3, help='Maximum matrix width.')
+    def init(height, width):
+        """ Initialize matrices and classes """
         from app.tasks import init
-        init()
+        init(int(height), int(width))
 
     return app
 

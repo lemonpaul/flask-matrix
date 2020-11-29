@@ -5,8 +5,12 @@ var class_show = function(class_name, class_id, length)
     xhttp = new XMLHttpRequest();
     left_ = event.pageX + 10;
     top_ = event.pageY + 10;
-    height_ = 26 + 78;
-    width_ = 84 * length;
+
+    w = Math.ceil(Math.sqrt(length))
+    h = Math.ceil(length/w)
+
+    height_ = 114 * h;
+    width_ = 84 * w;
     xhttp.onreadystatechange = function() {
         if (this.readyState === XMLHttpRequest.DONE) {
             modal.setAttribute("style", "left: "+left_+"px; top: "+top_+"px; width:"+width_+"px; height: "+height_+"px;");
@@ -15,7 +19,7 @@ var class_show = function(class_name, class_id, length)
             MathJax.typeset();
         }
     };
-    xhttp.open("GET", "/explore/"+class_name+"/"+class_id, true);
+    xhttp.open("GET", "/explore/"+class_name+"/"+class_id+"?width="+w+"&height="+h+"&size="+length, true);
     xhttp.send();
 }
 
