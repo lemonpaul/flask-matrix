@@ -1,3 +1,4 @@
+import time
 from app import create_app, db
 from app.models import Matrix, H_class, L_class, R_class, D_class
 
@@ -11,64 +12,30 @@ def init_matrices(height=3, width=3):
             for body in range(0, 1 << w*h):
                 matrix = Matrix(width=w, height=h, body=body)
                 db.session.add(matrix)
+                matrix.l_class = L_class()
+                matrix.r_class = R_class()
+                matrix.h_class = H_class()
 
-    db.session.commit()
+                for class_matrix in Matrix.query.all():
+                    if matrix == class_matrix:
+                        continue
+                    if matrix.row_space() == class_matrix.row_space():
+                        matrix.l_class = class_matrix.l_class
+                    if matrix.column_space() == class_matrix.column_space():
+                        matrix.r_class = class_matrix.r_class
+                    if matrix.row_space() == class_matrix.row_space() and matrix.column_space() == class_matrix.column_space():
+                        matrix.h_class = class_matrix.h_class
+                        break
 
-
-def init_h_classes():
-    for matrix in Matrix.query.all():
-        for h_class in H_class.query.all():
-            class_matrix = h_class.matrices[0]
-            if matrix.column_space() == class_matrix.column_space() and \
-                    matrix.row_space() == class_matrix.row_space():
-                h_class.matrices.append(matrix)
-                break
-        else:
-            h_class = H_class()
-            h_class.matrices.append(matrix)
-            db.session.add(h_class)
-    db.session.commit()
-
-
-def init_l_classes():
-    for matrix in Matrix.query.all():
-        for l_class in L_class.query.all():
-            class_matrix = l_class.matrices[0]
-            if matrix.row_space() == class_matrix.row_space():
-                l_class.matrices.append(matrix)
-                break
-        else:
-            l_class = L_class()
-            l_class.matrices.append(matrix)
-            db.session.add(l_class)
-    db.session.commit()
-
-
-def init_r_classes():
-    for matrix in Matrix.query.all():
-        for r_class in R_class.query.all():
-            class_matrix = r_class.matrices[0]
-            if matrix.column_space() == class_matrix.column_space():
-                r_class.matrices.append(matrix)
-                break
-        else:
-            r_class = R_class()
-            r_class.matrices.append(matrix)
-            db.session.add(r_class)
-    db.session.commit()
-
-
-def init_d_classes():
     for matrix in Matrix.query.all():
         for d_class in D_class.query.all():
             class_matrix = d_class.matrices[0]
             if set(matrix.r_class.matrices) & set(class_matrix.l_class.matrices):
-                d_class.matrices.append(matrix)
+                matrix.d_class = class_matrix.d_class
                 break
         else:
-            d_class = D_class()
-            d_class.matrices.append(matrix)
-            db.session.add(d_class)
+            matrix.d_class = D_class()
+
     db.session.commit()
 
 
@@ -84,8 +51,8 @@ def init(height=3, width=3):
     db.session.execute("ALTER SEQUENCE r_class_id_seq RESTART WITH 1")
     db.session.execute("ALTER SEQUENCE d_class_id_seq RESTART WITH 1")
     db.session.commit()
+
+    start_time = time.time()
     init_matrices(height, width)
-    init_h_classes()
-    init_l_classes()
-    init_r_classes()
-    init_d_classes()
+    #  init_d_classes()
+    print(f'Elapsed time: {(time.time() - start_time):.2f}')

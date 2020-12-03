@@ -35,9 +35,43 @@ def space(matrix):
     return space
 
 
-def isomorphic(matrix1, matrix2):
-    matrix1_row_space = list(list(tuple) for tuple in space(matrix1))
-    min_matrix1_isomporphic = space(transpose(matrix1_row_space))
-    matrix2_row_space = list(list(tuple) for tuple in space(matrix2))
-    min_matrix2_isomporphic = space(transpose(matrix2_row_space))
-    return min_matrix1_isomporphic == min_matrix2_isomporphic
+def column_space(matrix):
+    transpose_matrix = transpose(matrix)
+    return space(transpose_matrix)
+
+
+def row_space(matrix):
+    return space(matrix)
+
+
+def comparable(vector1, vector2):
+    if all(x <= y for x, y in zip(vector1, vector2)) or \
+            all(x >= y for x, y in zip(vector1, vector2)):
+        return True
+    return False
+
+
+def lattice(space):
+    n = len(space)
+
+    lattice = list()
+
+    for i in range(n):
+        lattice.append(list())
+        for j in range(n):
+            if i == j:
+                lattice[i].append(1)
+            elif comparable(space[i], space[j]):
+                lattice[i].append(1)
+            else:
+                lattice[i].append(0)
+
+    return lattice
+
+
+def isomorphic(lattice1, lattice2):
+    unordered_degree_sequnce1 = [sum(row) for row in lattice1]
+    unordered_degree_sequnce2 = [sum(row) for row in lattice2]
+    if unordered_degree_sequnce1[0] != unordered_degree_sequnce2[0]:
+        return False
+    return sorted(unordered_degree_sequnce1) == sorted(unordered_degree_sequnce2)

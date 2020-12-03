@@ -1,5 +1,5 @@
 from app import db
-from app.utils import transpose, space
+from app.utils import transpose, space, column_space, row_space, lattice, isomorphic
 from sqlalchemy.orm import relationship
 
 
@@ -47,12 +47,13 @@ class Matrix(db.Model):
         return data
 
     def column_space(self):
-        matrix = transpose(self.to_array())
-        return space(matrix)
+        return column_space(self.to_array())
 
     def row_space(self):
-        matrix = self.to_array()
-        return space(matrix)
+        return row_space(self.to_array())
+
+    def row_lattice(self):
+        return lattice(list(self.row_space()))
 
     def __repr__(self):
         return '<Matrix {}x{}>'.format(self.width, self.height)
