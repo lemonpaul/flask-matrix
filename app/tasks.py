@@ -13,14 +13,16 @@ def init_matrices(height=3, width=3):
                 matrix = Matrix(width=w, height=h, body=body)
                 db.session.add(matrix)
 
-    for matrix in Matrix.query.all():
-        for h_class in H_class.query.all():
-            class_matrix = h_class.matrices[0]
-            if matrix.row_space() == class_matrix.row_space() and matrix.column_space() == class_matrix.column_space():
-                class_matrix.h_class.matrices.append(matrix)
-                break
-        else:
-            matrix.h_class = H_class()
+    for h in range(1, height+1):
+        for w in range(1, width + 1):
+            for matrix in Matrix.query.filter(width == w, height == h).all():
+                for h_class in H_class.query.join(Matrix).filter(Matrix.width == w, Matrix.height == h).all():
+                    class_matrix = h_class.matrices[0]
+                    if matrix.row_space() == class_matrix.row_space() and matrix.column_space() == class_matrix.column_space():
+                        class_matrix.h_class.matrices.append(matrix)
+                        break
+                else:
+                    matrix.h_class = H_class()
 
     for h_class in H_class.query.all():
         matrix = h_class.matrices[0]
@@ -32,7 +34,6 @@ def init_matrices(height=3, width=3):
         else:
             class_ = L_class()
             class_.matrices.extend(h_class.matrices)
-            db.session.add(class_)
 
     for h_class in H_class.query.all():
         matrix = h_class.matrices[0]
@@ -44,7 +45,6 @@ def init_matrices(height=3, width=3):
         else:
             class_ = R_class()
             class_.matrices.extend(h_class.matrices)
-            db.session.add(class_)
 
     for l_class in L_class.query.all():
         matrix = l_class.matrices[0]
@@ -56,7 +56,6 @@ def init_matrices(height=3, width=3):
         else:
             class_ = D_class()
             class_.matrices.extend(l_class.matrices)
-            db.session.add(class_)
 
     db.session.commit()
 
