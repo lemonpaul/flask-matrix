@@ -28,3 +28,15 @@ var class_hide = function()
     modal.style.display = "none";
 }
 
+var toggle = function(id) 
+{
+    var element = document.getElementById(id);
+    if (element.style.display === "none") 
+    {
+        element.removeAttribute("style");
+    }
+    else 
+    {
+        element.style.display = "none";
+    }
+}
