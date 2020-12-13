@@ -44,7 +44,7 @@
 
 {% block scripts %}
     <script type="text/javascript" id="MathJax-script" async
-            src="http://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+            src="{{ url_for('static', filename='MathJax/es5/tex-chtml-full.js') }}">
     </script>
     <script>
         MathJax = {
