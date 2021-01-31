@@ -75,3 +75,23 @@ def isomorphic(lattice1, lattice2):
     if unordered_degree_sequnce1[0] != unordered_degree_sequnce2[0]:
         return False
     return sorted(unordered_degree_sequnce1) == sorted(unordered_degree_sequnce2)
+
+
+def multiplication(matrix1, matrix2):
+    if len(matrix1[0]) != len(matrix2):
+        return None
+
+    n = len(matrix1)
+    m = len(matrix2[1])
+
+    result = list()
+    for i in range(0, m):
+        result.append([0] * n)
+
+    for i in range(0, n):
+        for j in range(0, m):
+            v1 = matrix1[i]
+            v2 = [v[j] for v in matrix2]
+            result[i][j] = int(any(meet(v1, v2)))
+
+    return result

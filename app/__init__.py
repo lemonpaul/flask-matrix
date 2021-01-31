@@ -13,6 +13,7 @@ bootstrap = Bootstrap()
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
+    app.config['BOOTSTRAP_SERVE_LOCAL'] = True
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -30,6 +31,3 @@ def create_app(config_class=Config):
         init(int(height), int(width))
 
     return app
-
-
-from app import models
