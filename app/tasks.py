@@ -5,7 +5,7 @@ from app.models import Matrix, H_class, L_class, R_class, D_class
 app = create_app()
 app.app_context().push()
 
-def init_matrices_2(height = 3, width = 3)
+def init_matrices_2(height = 3, width = 3):
     for h in range(1, height+1):
         for w in range(1, width + 1):
             for body in range(0, 1 << w*h):
