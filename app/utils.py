@@ -85,13 +85,28 @@ def multiplication(matrix1, matrix2):
     m = len(matrix2[1])
 
     result = list()
-    for i in range(0, m):
+    for i in range(m):
         result.append([0] * n)
 
-    for i in range(0, n):
-        for j in range(0, m):
+    for i in range(n):
+        for j in range(m):
             v1 = matrix1[i]
             v2 = [v[j] for v in matrix2]
             result[i][j] = int(any(meet(v1, v2)))
 
     return result
+
+
+def get_matrix(matrix):
+    from app.models import Matrix
+
+    h = len(matrix)
+    w = len(matrix[0])
+
+    body = 0
+    for i in range(h):
+        for j in range(w):
+            body |= ((1 & matrix[i][j]) << (h * w - (i * w + j) - 1))
+
+    return Matrix.query.filter(Matrix.height == h, Matrix.width == w,
+                               Matrix.body == body).first()

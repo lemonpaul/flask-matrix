@@ -13,6 +13,11 @@ def init_matrices(height=3, width=3, max_batch_size=512):
                 matrix = Matrix(width=w, height=h, body=body)
                 db.session.add(matrix)
 
+    for matrix_i in Matrix.query.all():
+        h_class = H_class()
+        for matrix_j in Matrix.query.filter(Matrix.height == matrix_i.width):
+            pass
+
     for h in range(1, height+1):
         for w in range(1, width + 1):
             matrices = Matrix.query.filter(Matrix.width == w, Matrix.height == h).all()
