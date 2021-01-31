@@ -5,6 +5,62 @@ from app.models import Matrix, H_class, L_class, R_class, D_class
 app = create_app()
 app.app_context().push()
 
+def init_matrices_2(height = 3, width = 3)
+    for h in range(1, height+1):
+        for w in range(1, width + 1):
+            for body in range(0, 1 << w*h):
+                matrix = Matrix(width=w, height=h, body=body)
+                db.session.add(matrix)
+
+    for matrix_i in Matrix.query.all():
+        if not matrix_i.l_class:
+            matrix_i.l_class = L_class()
+
+            for matrix_j in Matrix.query.filter(Matrix.width == matrix_i.height, Matrix.body != 0):
+                matrix_array = multiplication(matrix_j.to_array(), matrix_i.to_array())
+                matrix = get_matrix(matrix_array)
+
+                if matrix not in matrix_i.l_class.matrices:
+                    matrix_i.l_class.matrices.append(matrix)
+
+                    print(f'{matrix_j.to_array()} x {matrix_i.to_array()} = {matrix.to_array()}')
+
+            print(f'L_class from {len(matrix_i.l_class.matrices)}')
+
+        if not matrix_i.r_class:
+            matrix_i.r_class = R_class()
+
+            for matrix_j in Matrix.query.filter(Matrix.height == matrix_i.width, Matrix.body != 0):
+                matrix_array = multiplication(matrix_i.to_array(), matrix_j.to_array())
+                matrix = get_matrix(matrix_array)
+                if matrix not in matrix_i.r_class.matrices:
+                    matrix_i.r_class.matrices.append(matrix)
+
+        if not matrix_i.h_class:
+            matrix_i.h_class = H_class()
+            matrices_ids = set(m.id for m in matrix_i.l_class.matrices) & \
+                set(m.id for m in matrix_i.r_class.matrices) - \
+                {matrix_i.id}
+
+            subquery = Matrix.query.filter(Matrix.id.in_(matrices_ids))
+            matrix_i.h_class.matrices.extend(subquery.all())
+
+        if not matrix_i.d_class:
+            matrices_ids = set(m.id for m in matrix_i.l_class.matrices) | \
+                            set(m.id for m in matrix_i.r_class.matrices)
+            for d_class in D_class.query.all():
+                d_class_matrices_ids = set(m.id for m in d_class.matrices)
+                if d_class_matrices_ids & matrices_ids != set():
+                    matrices_ids = matrices_ids - d_class_matrices_ids
+                    subquery = Matrix.query.filter(Matrix.id.in_(matrices_ids))
+                    d_class.matrices.extend(subquery.all())
+            else:
+                matrix_i.d_class = D_class()
+                subquery = Matrix.query.filter(Matrix.id.in_(matrices_ids))
+                matrix_i.d_class.matrices.extend(subquery.all())
+
+    db.session.commit()
+
 
 def init_matrices(height=3, width=3, max_batch_size=512):
     for h in range(1, height+1):
