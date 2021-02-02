@@ -1,9 +1,12 @@
 import time
+
 from app import create_app, db
 from app.models import Matrix, H_class, L_class, R_class, D_class
+from app.utils import multiplication, intersection
 
 app = create_app()
 app.app_context().push()
+
 
 def init_matrices_2(height = 3, width = 3):
     for h in range(1, height+1):
@@ -12,146 +15,112 @@ def init_matrices_2(height = 3, width = 3):
                 matrix = Matrix(width=w, height=h, body=body)
                 db.session.add(matrix)
 
-    for matrix_i in Matrix.query.all():
-        if not matrix_i.l_class:
-            matrix_i.l_class = L_class()
+    for alpha in Matrix.query.all():
+        l_class = L_class()
 
-            for matrix_j in Matrix.query.filter(Matrix.width == matrix_i.height, Matrix.body != 0):
-                matrix_array = multiplication(matrix_j.to_array(), matrix_i.to_array())
-                matrix = get_matrix(matrix_array)
+        for M_i in Matrix.query.filter(Matrix.width == alpha.height):
+            l_class.matrices = multiplication(M_i.id, alpha.id)
 
-                if matrix not in matrix_i.l_class.matrices:
-                    matrix_i.l_class.matrices.append(matrix)
+        if not alpha.l_class:
+            alpha.l_class = l_class
+        else:
+            alpha.l_class = intersection(alpha.l_class.id, l_class.id)
 
-                    print(f'{matrix_j.to_array()} x {matrix_i.to_array()} = {matrix.to_array()}')
-
-            print(f'L_class from {len(matrix_i.l_class.matrices)}')
-
-        if not matrix_i.r_class:
-            matrix_i.r_class = R_class()
-
-            for matrix_j in Matrix.query.filter(Matrix.height == matrix_i.width, Matrix.body != 0):
-                matrix_array = multiplication(matrix_i.to_array(), matrix_j.to_array())
-                matrix = get_matrix(matrix_array)
-                if matrix not in matrix_i.r_class.matrices:
-                    matrix_i.r_class.matrices.append(matrix)
-
-        if not matrix_i.h_class:
-            matrix_i.h_class = H_class()
-            matrices_ids = set(m.id for m in matrix_i.l_class.matrices) & \
-                set(m.id for m in matrix_i.r_class.matrices) - \
-                {matrix_i.id}
-
-            subquery = Matrix.query.filter(Matrix.id.in_(matrices_ids))
-            matrix_i.h_class.matrices.extend(subquery.all())
-
-        if not matrix_i.d_class:
-            matrices_ids = set(m.id for m in matrix_i.l_class.matrices) | \
-                            set(m.id for m in matrix_i.r_class.matrices)
-            for d_class in D_class.query.all():
-                d_class_matrices_ids = set(m.id for m in d_class.matrices)
-                if d_class_matrices_ids & matrices_ids != set():
-                    matrices_ids = matrices_ids - d_class_matrices_ids
-                    subquery = Matrix.query.filter(Matrix.id.in_(matrices_ids))
-                    d_class.matrices.extend(subquery.all())
-            else:
-                matrix_i.d_class = D_class()
-                subquery = Matrix.query.filter(Matrix.id.in_(matrices_ids))
-                matrix_i.d_class.matrices.extend(subquery.all())
+        db.session.flush()
 
     db.session.commit()
 
 
-def init_matrices(height=3, width=3, max_batch_size=512):
-    for h in range(1, height+1):
-        for w in range(1, width + 1):
-            for body in range(0, 1 << w*h):
-                matrix = Matrix(width=w, height=h, body=body)
-                db.session.add(matrix)
+# def init_matrices(height, width, max_batch_size):
+#     for h in range(1, height+1):
+#         for w in range(1, width + 1):
+#             for body in range(0, 1 << w*h):
+#                 matrix = Matrix(width=w, height=h, body=body)
+#                 db.session.add(matrix)
+#
+#     for matrix_i in Matrix.query.all():
+#         h_class = H_class()
+#         for matrix_j in Matrix.query.filter(Matrix.height == matrix_i.width):
+#             pass
+#
+#     for h in range(1, height+1):
+#         for w in range(1, width + 1):
+#             matrices = Matrix.query.filter(Matrix.width == w, Matrix.height == h).all()
+#             matrix_length = matrices.__len__()
+#             batch_size = min(matrix_length, max_batch_size)
+#             batch_length = int(matrix_length / batch_size)
+#             print(f'{w}x{h} matrices. {batch_length} batches.')
+#             batches = []
+#             for n_batch in range(0, batch_length):
+#                 print(f'Fill batch {n_batch+1}/{batch_length}...')
+#                 batches.append([])
+#                 for matrix in matrices[n_batch*batch_size:(n_batch+1)*batch_size]:
+#                     for h_class in batches[n_batch]:
+#                         class_matrix = h_class.matrices[0]
+#                         if matrix.row_space() == class_matrix.row_space() and matrix.column_space() == class_matrix.column_space():
+#                             h_class.matrices.append(matrix)
+#                             break
+#                     else:
+#                         matrix.h_class = H_class()
+#                         batches[n_batch].append(matrix.h_class)
+#
+#             all_h_classes = []
+#             if batch_length > 1:
+#                 n_batch = 1
+#                 for batch in batches:
+#                     print(f'Process batch {n_batch}/{batch_length}, {len(batch)} H-classes...')
+#
+#                     for batch_h_class in batch:
+#                         matrix = batch_h_class.matrices[0]
+#                         for h_class in all_h_classes:
+#                             class_matrix = h_class.matrices[0]
+#                             if matrix.row_space() == class_matrix.row_space() and matrix.column_space() == class_matrix.column_space():
+#                                 h_class.matrices.extend(list(batch_h_class.matrices))
+#                                 all_h_classes.append(h_class)
+#                                 db.session.expunge(batch_h_class)
+#                                 break
+#                         else:
+#                             all_h_classes.append(batch_h_class)
+#
+#                     n_batch += 1
+#
+#     for h_class in H_class.query.all():
+#         matrix = h_class.matrices[0]
+#         for l_class in L_class.query.all():
+#             class_matrix = l_class.matrices[0]
+#             if matrix.row_space() == class_matrix.row_space():
+#                 class_matrix.l_class.matrices.extend(h_class.matrices)
+#                 break
+#         else:
+#             class_ = L_class()
+#             class_.matrices.extend(h_class.matrices)
+#
+#     for h_class in H_class.query.all():
+#         matrix = h_class.matrices[0]
+#         for r_class in R_class.query.all():
+#             class_matrix = r_class.matrices[0]
+#             if matrix.column_space() == class_matrix.column_space():
+#                 class_matrix.r_class.matrices.extend(h_class.matrices)
+#                 break
+#         else:
+#             class_ = R_class()
+#             class_.matrices.extend(h_class.matrices)
+#
+#     for l_class in L_class.query.all():
+#         matrix = l_class.matrices[0]
+#         for d_class in D_class.query.all():
+#             class_matrix = d_class.matrices[0]
+#             if set(matrix.r_class.matrices) & set(class_matrix.l_class.matrices):
+#                 class_matrix.d_class.matrices.extend(l_class.matrices)
+#                 break
+#         else:
+#             class_ = D_class()
+#             class_.matrices.extend(l_class.matrices)
+#
+#     db.session.commit()
 
-    for matrix_i in Matrix.query.all():
-        h_class = H_class()
-        for matrix_j in Matrix.query.filter(Matrix.height == matrix_i.width):
-            pass
 
-    for h in range(1, height+1):
-        for w in range(1, width + 1):
-            matrices = Matrix.query.filter(Matrix.width == w, Matrix.height == h).all()
-            matrix_length = matrices.__len__()
-            batch_size = min(matrix_length, max_batch_size)
-            batch_length = int(matrix_length / batch_size)
-            print(f'{w}x{h} matrices. {batch_length} batches.')
-            batches = []
-            for n_batch in range(0, batch_length):
-                print(f'Fill batch {n_batch+1}/{batch_length}...')
-                batches.append([])
-                for matrix in matrices[n_batch*batch_size:(n_batch+1)*batch_size]:
-                    for h_class in batches[n_batch]:
-                        class_matrix = h_class.matrices[0]
-                        if matrix.row_space() == class_matrix.row_space() and matrix.column_space() == class_matrix.column_space():
-                            h_class.matrices.append(matrix)
-                            break
-                    else:
-                        matrix.h_class = H_class()
-                        batches[n_batch].append(matrix.h_class)
-
-            all_h_classes = []
-            if batch_length > 1:
-                n_batch = 1
-                for batch in batches:
-                    print(f'Process batch {n_batch}/{batch_length}, {len(batch)} H-classes...')
-
-                    for batch_h_class in batch:
-                        matrix = batch_h_class.matrices[0]
-                        for h_class in all_h_classes:
-                            class_matrix = h_class.matrices[0]
-                            if matrix.row_space() == class_matrix.row_space() and matrix.column_space() == class_matrix.column_space():
-                                h_class.matrices.extend(list(batch_h_class.matrices))
-                                all_h_classes.append(h_class)
-                                db.session.expunge(batch_h_class)
-                                break
-                        else:
-                            all_h_classes.append(batch_h_class)
-
-                    n_batch += 1
-
-    for h_class in H_class.query.all():
-        matrix = h_class.matrices[0]
-        for l_class in L_class.query.all():
-            class_matrix = l_class.matrices[0]
-            if matrix.row_space() == class_matrix.row_space():
-                class_matrix.l_class.matrices.extend(h_class.matrices)
-                break
-        else:
-            class_ = L_class()
-            class_.matrices.extend(h_class.matrices)
-
-    for h_class in H_class.query.all():
-        matrix = h_class.matrices[0]
-        for r_class in R_class.query.all():
-            class_matrix = r_class.matrices[0]
-            if matrix.column_space() == class_matrix.column_space():
-                class_matrix.r_class.matrices.extend(h_class.matrices)
-                break
-        else:
-            class_ = R_class()
-            class_.matrices.extend(h_class.matrices)
-
-    for l_class in L_class.query.all():
-        matrix = l_class.matrices[0]
-        for d_class in D_class.query.all():
-            class_matrix = d_class.matrices[0]
-            if set(matrix.r_class.matrices) & set(class_matrix.l_class.matrices):
-                class_matrix.d_class.matrices.extend(l_class.matrices)
-                break
-        else:
-            class_ = D_class()
-            class_.matrices.extend(l_class.matrices)
-
-    db.session.commit()
-
-
-def init(height=3, width=3, max_batch_size=512):
+def init(height=2, width=2, max_batch_size=512):
     Matrix.query.delete()
     H_class.query.delete()
     L_class.query.delete()
@@ -165,5 +134,5 @@ def init(height=3, width=3, max_batch_size=512):
     db.session.commit()
 
     start = time.time()
-    init_matrices(height, width, max_batch_size)
+    init_matrices_2(height, width)
     return time.time() - start

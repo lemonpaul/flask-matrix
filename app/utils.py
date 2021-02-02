@@ -21,18 +21,18 @@ def transpose(matrix):
 
 
 def space(matrix):
-    space = set([tuple(vector) for vector in matrix])
+    space_ = set([tuple(vector) for vector in matrix])
 
     n = len(matrix)
     m = len(matrix[0])
 
     for i in range(n):
         for j in range(i+1, n):
-            space.add(tuple(join(matrix[i], matrix[j])))
+            space_.add(tuple(join(matrix[i], matrix[j])))
 
-    space.add((0,) * m)
+    space_.add((0,) * m)
 
-    return space
+    return space_
 
 
 def column_space(matrix):
@@ -51,30 +51,30 @@ def comparable(vector1, vector2):
     return False
 
 
-def lattice(space):
-    n = len(space)
+def lattice(space_):
+    n = len(space_)
 
-    lattice = list()
+    lattice_ = list()
 
     for i in range(n):
-        lattice.append(list())
+        lattice_.append(list())
         for j in range(n):
             if i == j:
-                lattice[i].append(1)
+                lattice_[i].append(1)
             elif comparable(space[i], space[j]):
-                lattice[i].append(1)
+                lattice_[i].append(1)
             else:
-                lattice[i].append(0)
+                lattice_[i].append(0)
 
-    return lattice
+    return lattice_
 
 
 def isomorphic(lattice1, lattice2):
-    unordered_degree_sequnce1 = [sum(row) for row in lattice1]
-    unordered_degree_sequnce2 = [sum(row) for row in lattice2]
-    if unordered_degree_sequnce1[0] != unordered_degree_sequnce2[0]:
+    unordered_degree_sequence1 = [sum(row) for row in lattice1]
+    unordered_degree_sequence2 = [sum(row) for row in lattice2]
+    if unordered_degree_sequence1[0] != unordered_degree_sequence2[0]:
         return False
-    return sorted(unordered_degree_sequnce1) == sorted(unordered_degree_sequnce2)
+    return sorted(unordered_degree_sequence1) == sorted(unordered_degree_sequence2)
 
 
 def multiplication(matrix1, matrix2):
@@ -95,6 +95,17 @@ def multiplication(matrix1, matrix2):
             result[i][j] = int(any(meet(v1, v2)))
 
     return result
+
+
+def intersection(l_class_id_1, l_class_id_2):
+    from app.models import Matrix, L_class
+
+    set_1 = {matrix.id for matrix in L_class.query.get(l_class_id_1).matrices}
+    set_2 = {matrix.id for matrix in L_class.query.get(l_class_id_2).matrices}
+
+    meet_set = set_1 & set_2
+
+    return Matrix.query.filter(Matrix.id.in_(meet_set))
 
 
 def get_matrix(matrix):
