@@ -28,6 +28,9 @@ def create_app(config_class=Config):
     def init(height, width):
         """ Initialize matrices and classes """
         from app.tasks import init
-        init(int(height), int(width))
+
+        time = init(int(height), int(width))
+
+        print(f'Estimated time: {time} seconds.')
 
     return app
