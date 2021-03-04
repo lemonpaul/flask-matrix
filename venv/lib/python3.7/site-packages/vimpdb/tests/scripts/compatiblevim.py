@@ -1,1 +1,0 @@
-print "+clientserver +python"
