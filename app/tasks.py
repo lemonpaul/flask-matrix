@@ -1,5 +1,7 @@
 import time
 
+from math import ceil, log
+
 from app import create_app, db
 from app.models import Matrix, H_class, L_class, R_class, D_class
 
@@ -7,7 +9,7 @@ app = create_app()
 app.app_context().push()
 
 
-def init_matrices(height, width, max_batch_size):
+def init_matrices(height, width, n_threads):
     for h in range(1, height+1):
         for w in range(1, width + 1):
             for body in range(0, 1 << w*h):
@@ -17,31 +19,34 @@ def init_matrices(height, width, max_batch_size):
     for h in range(1, height+1):
         for w in range(1, width + 1):
             matrices = Matrix.query.filter(Matrix.width == w, Matrix.height == h).all()
-            matrix_length = matrices.__len__()
-            batch_size = min(matrix_length, max_batch_size)
-            batch_length = int(matrix_length / batch_size)
-            print(f'{w}x{h} matrices. {batch_length} batches.')
+            n_matrices = matrices.__len__()
+            if n_matrices / n_threads > 1:
+                s_batch = 2 ** ceil(log(n_matrices/n_threads, 2))
+            else:
+                s_batch = n_matrices
+            n_batches = int(n_matrices / s_batch)
+            print(f'{w}x{h} matrices. {n_batches} batches.')
             batches = []
-            for n_batch in range(0, batch_length):
-                print(f'Fill batch {n_batch+1}/{batch_length}...')
+            for idx_batch in range(0, n_batches):
+                print(f'Fill batch {idx_batch+1}/{n_batches}...')
                 batches.append([])
-                for matrix in matrices[n_batch*batch_size:(n_batch+1)*batch_size]:
-                    for h_class in batches[n_batch]:
+                for matrix in matrices[idx_batch*s_batch:(idx_batch+1)*s_batch]:
+                    for h_class in batches[idx_batch]:
                         class_matrix = h_class.matrices[0]
                         if matrix.row_space() == class_matrix.row_space() and matrix.column_space() == class_matrix.column_space():
                             h_class.matrices.append(matrix)
                             break
                     else:
                         matrix.h_class = H_class()
-                        batches[n_batch].append(matrix.h_class)
+                        batches[idx_batch].append(matrix.h_class)
 
-            all_h_classes = []
-            if batch_length > 1:
-                n_batch = 1
-                for batch in batches:
-                    print(f'Process batch {n_batch}/{batch_length}, {len(batch)} H-classes...')
+            if n_batches > 1:
+                all_h_classes = []
+                idx_batch = 0
+                for idx_batch in range(0, n_batches):
+                    print(f'Process batch {idx_batch+1}/{n_batches}, {len(batches[idx_batch])} H-classes...')
 
-                    for batch_h_class in batch:
+                    for batch_h_class in batches[idx_batch]:
                         matrix = batch_h_class.matrices[0]
                         for h_class in all_h_classes:
                             class_matrix = h_class.matrices[0]
@@ -52,8 +57,6 @@ def init_matrices(height, width, max_batch_size):
                                 break
                         else:
                             all_h_classes.append(batch_h_class)
-
-                    n_batch += 1
 
     for h_class in H_class.query.all():
         matrix = h_class.matrices[0]
@@ -91,19 +94,14 @@ def init_matrices(height, width, max_batch_size):
     db.session.commit()
 
 
-def init(height=3, width=3, max_batch_size=512):
+def init(height=3, width=3, n_threads=8):
     Matrix.query.delete()
     H_class.query.delete()
     L_class.query.delete()
     R_class.query.delete()
     D_class.query.delete()
-    # db.session.execute("ALTER SEQUENCE matrix_id_seq RESTART WITH 1")
-    # db.session.execute("ALTER SEQUENCE h_class_id_seq RESTART WITH 1")
-    # db.session.execute("ALTER SEQUENCE l_class_id_seq RESTART WITH 1")
-    # db.session.execute("ALTER SEQUENCE r_class_id_seq RESTART WITH 1")
-    # db.session.execute("ALTER SEQUENCE d_class_id_seq RESTART WITH 1")
     db.session.commit()
 
     start = time.time()
-    init_matrices(height, width, max_batch_size)
+    init_matrices(height, width, n_threads)
     return time.time() - start
