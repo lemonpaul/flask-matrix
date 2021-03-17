@@ -108,7 +108,7 @@ def intersection(l_class_id_1, l_class_id_2):
     return Matrix.query.filter(Matrix.id.in_(meet_set))
 
 
-def get_matrix(matrix):
+def find_alchemy_matrix(matrix):
     from app.models import Matrix
 
     h = len(matrix)
@@ -121,3 +121,14 @@ def get_matrix(matrix):
 
     return Matrix.query.filter(Matrix.height == h, Matrix.width == w,
                                Matrix.body == body).first()
+
+def get_matrix(height, width, body):
+    data = [[]] * height
+    for k in range(height):
+        data[k] = [0] * width
+    for i in range(height):
+        for j in range(width):
+            shift = width * height - (i * width + j) - 1
+            if 1 << shift & body:
+                data[i][j] = 1
+    return data

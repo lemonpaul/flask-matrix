@@ -4,92 +4,89 @@ from math import ceil, log
 
 from app import create_app, db
 from app.models import Matrix, H_class, L_class, R_class, D_class
+from app.utils import get_matrix, row_space, column_space, find_alchemy_matrix
 
 app = create_app()
 app.app_context().push()
 
 
 def init_matrices(height, width, n_threads):
-    for h in range(1, height+1):
-        for w in range(1, width + 1):
-            for body in range(0, 1 << w*h):
-                matrix = Matrix(width=w, height=h, body=body)
-                db.session.add(matrix)
+    h_classes = []
 
     for h in range(1, height+1):
-        for w in range(1, width + 1):
-            matrices = Matrix.query.filter(Matrix.width == w, Matrix.height == h).all()
-            n_matrices = matrices.__len__()
-            if n_matrices / n_threads > 1:
-                s_batch = 2 ** ceil(log(n_matrices/n_threads, 2))
-            else:
-                s_batch = n_matrices
-            n_batches = int(n_matrices / s_batch)
-            print(f'{w}x{h} matrices. {n_batches} batches.')
-            batches = []
-            for idx_batch in range(0, n_batches):
-                print(f'Fill batch {idx_batch+1}/{n_batches}...')
-                batches.append([])
-                for matrix in matrices[idx_batch*s_batch:(idx_batch+1)*s_batch]:
-                    for h_class in batches[idx_batch]:
-                        class_matrix = h_class.matrices[0]
-                        if matrix.row_space() == class_matrix.row_space() and matrix.column_space() == class_matrix.column_space():
-                            h_class.matrices.append(matrix)
-                            break
-                    else:
-                        matrix.h_class = H_class()
-                        batches[idx_batch].append(matrix.h_class)
+        for w in range(1, width+1):
+            matrices = []
 
-            if n_batches > 1:
-                all_h_classes = []
-                idx_batch = 0
-                for idx_batch in range(0, n_batches):
-                    print(f'Process batch {idx_batch+1}/{n_batches}, {len(batches[idx_batch])} H-classes...')
+            for b in range(0, 1 << w*h):
+                matrix = get_matrix(h, w, b)
+                matrices.append(matrix)
 
-                    for batch_h_class in batches[idx_batch]:
-                        matrix = batch_h_class.matrices[0]
-                        for h_class in all_h_classes:
-                            class_matrix = h_class.matrices[0]
-                            if matrix.row_space() == class_matrix.row_space() and matrix.column_space() == class_matrix.column_space():
-                                h_class.matrices.extend(list(batch_h_class.matrices))
-                                all_h_classes.append(h_class)
-                                db.session.expunge(batch_h_class)
-                                break
-                        else:
-                            all_h_classes.append(batch_h_class)
+                alchemy_matrix = Matrix(width=w, height=h, body=b)
+                db.session.add(alchemy_matrix)
 
-    for h_class in H_class.query.all():
-        matrix = h_class.matrices[0]
-        for l_class in L_class.query.all():
-            class_matrix = l_class.matrices[0]
-            if matrix.row_space() == class_matrix.row_space():
-                class_matrix.l_class.matrices.extend(h_class.matrices)
+            print(f'{w}x{h} matrices. {len(matrices)} matrices.')
+
+            size_h_classes = []
+
+            for matrix in matrices:
+                for h_class in size_h_classes:
+                    class_matrix = h_class[0]
+                    if row_space(matrix) == row_space(class_matrix) and \
+                            column_space(matrix) == column_space(class_matrix):
+                        h_class.append(matrix)
+                        break
+                else:
+                    h_class = [matrix]
+                    size_h_classes.append(h_class)
+           
+            h_classes.extend(size_h_classes)
+
+    l_classes = []
+
+    for h_class in h_classes:
+        matrix = h_class[0]
+
+        for l_class in l_classes:
+            class_matrix = l_class[0]
+            if row_space(matrix) == row_space(class_matrix):
+                l_class.extend(h_class)
                 break
         else:
-            class_ = L_class()
-            class_.matrices.extend(h_class.matrices)
+            l_class = h_class
+            l_classes.append(l_class)
 
-    for h_class in H_class.query.all():
-        matrix = h_class.matrices[0]
-        for r_class in R_class.query.all():
-            class_matrix = r_class.matrices[0]
-            if matrix.column_space() == class_matrix.column_space():
-                class_matrix.r_class.matrices.extend(h_class.matrices)
+    r_classes = []
+
+    for h_class in h_classes:
+        matrix = h_class[0]
+
+        for r_class in r_classes:
+            class_matrix = r_class[0]
+            if column_space(matrix) == column_space(class_matrix):
+                r_class.extend(h_class)
                 break
         else:
-            class_ = R_class()
-            class_.matrices.extend(h_class.matrices)
+            r_class = h_class
+            r_classes.append(r_class)
 
-    for l_class in L_class.query.all():
-        matrix = l_class.matrices[0]
-        for d_class in D_class.query.all():
-            class_matrix = d_class.matrices[0]
-            if set(matrix.r_class.matrices) & set(class_matrix.l_class.matrices):
-                class_matrix.d_class.matrices.extend(l_class.matrices)
+    d_classes = []
+
+    for l_class in l_classes:
+        matrix = l_class[0]
+        for d_class in d_classes:
+            class_matrix = d_class[0]
+
+            matrix_r_class = next(filter(lambda r_class: matrix in r_class, r_classes))
+
+            class_matrix_l_class = next(filter(lambda l_class: class_matrix in l_class, l_classes))
+
+            if set(matrix_r_class) & set(class_matrix_l_class):
+                d_class.extend(l_class.matrices)
                 break
         else:
-            class_ = D_class()
-            class_.matrices.extend(l_class.matrices)
+            d_class = []
+            d_class.extend(l_class)
+            d_classes.append(d_class)
 
     db.session.commit()
 
