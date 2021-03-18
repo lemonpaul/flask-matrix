@@ -21,18 +21,18 @@ def transpose(matrix):
 
 
 def space(matrix):
-    space_ = set([tuple(vector) for vector in matrix])
+    space = set([tuple(vector) for vector in matrix])
 
     n = len(matrix)
     m = len(matrix[0])
 
     for i in range(n):
         for j in range(i+1, n):
-            space_.add(tuple(join(matrix[i], matrix[j])))
+            space.add(tuple(join(matrix[i], matrix[j])))
 
-    space_.add((0,) * m)
+    space.add((0,) * m)
 
-    return space_
+    return space
 
 
 def column_space(matrix):
@@ -132,6 +132,7 @@ def get_matrix(height, width, body):
             if 1 << shift & body:
                 data[i][j] = 1
     return data
+
 
 def as_set(data):
     return set(tuple(tuple(vector) for vector in matrix) for matrix in data)
