@@ -4,7 +4,7 @@ from math import ceil, log
 
 from app import create_app, db
 from app.models import Matrix, H_class, L_class, R_class, D_class
-from app.utils import get_matrix, row_space, column_space, find_alchemy_matrix
+from app.utils import get_matrix, row_space, column_space, find_alchemy_matrix, as_set
 
 app = create_app()
 app.app_context().push()
@@ -80,13 +80,16 @@ def init_matrices(height, width, n_threads):
 
             class_matrix_l_class = next(filter(lambda l_class: class_matrix in l_class, l_classes))
 
-            if set(matrix_r_class) & set(class_matrix_l_class):
-                d_class.extend(l_class.matrices)
+            if as_set(matrix_r_class) & as_set(class_matrix_l_class):
+                d_class.extend(l_class)
                 break
         else:
             d_class = []
             d_class.extend(l_class)
             d_classes.append(d_class)
+
+    for d_class in d_classes:
+        print(len(d_class))
 
     db.session.commit()
 

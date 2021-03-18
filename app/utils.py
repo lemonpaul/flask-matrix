@@ -132,3 +132,6 @@ def get_matrix(height, width, body):
             if 1 << shift & body:
                 data[i][j] = 1
     return data
+
+def as_set(data):
+    return set(tuple(tuple(vector) for vector in matrix) for matrix in data)
