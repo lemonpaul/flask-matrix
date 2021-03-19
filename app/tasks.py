@@ -38,7 +38,6 @@ def init_data(height, width, n_threads):
                 alchemy_matrix = Matrix(width=w, height=h, body=b)
                 db.session.add(alchemy_matrix)
 
-
             print(f'Computing H-classes for {w}x{h} matrices...')
 
             size_h_classes = []
