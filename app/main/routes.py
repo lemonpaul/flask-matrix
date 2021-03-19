@@ -1,9 +1,19 @@
+import base64
+import networkx as nx
+import matplotlib
+
+matplotlib.use('Agg')
+
+import matplotlib.pyplot as plt
+
+from io import BytesIO
 from app import db
 from app.main import bp
 from app.models import Matrix, intersection, width, height
-from flask import render_template, request, url_for, current_app
+from flask import render_template, request, url_for, current_app, send_file
 from importlib import import_module
 from app.tasks import app
+from matplotlib.figure import Figure
 
 app.app_context().push()
 
@@ -31,6 +41,19 @@ def matrix_index():
     return render_template('matrix/index.html', title='Matrices', matrices=matrices.items,
                            page=matrices.page, pages=matrices.pages, per_page=matrices.per_page, total=matrices.total,
                            next_url=next_url, prev_url=prev_url)
+
+
+@bp.route('/poset')
+def poset():
+    G = nx.complete_graph(5)
+    nx.draw(G)
+
+    img = BytesIO() # file-like object for the image
+    plt.savefig(img, format='png') # save the image to the stream
+    plt.clf()
+
+    data = base64.b64encode(img.getbuffer()).decode("ascii")
+    return render_template('poset.html', title='Partial order set of D-classes', data=data)
 
 
 @bp.route('/explore/<string:class_name>')
